@@ -1,0 +1,14 @@
+{
+  "name": "mocha-reportportal",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "chai": "4.2.0",
+    "mocha": "6.2.1",
+    "mocha-rp-reporter": "1.0.12",
+    "yargs": "14.2.0"
+  }
+}
