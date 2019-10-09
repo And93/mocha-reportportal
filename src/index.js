@@ -6,10 +6,12 @@ const Mocha = require('mocha'),
     yargs = require('yargs'),
     {xl, m} = require('./helpers/timeouts');
 
-const testDir = './src/tests/';
-
 const {argv} = yargs
-    .string('test');
+    .string('test')
+    .string('suite')
+    .default('suite', '');
+
+const testDir = `./src/tests/${argv.suite}`;
 
 const mocha = new Mocha({
     reporter: 'mocha-rp-reporter',
