@@ -1,30 +1,36 @@
 'use strict';
 
 const Mocha = require('mocha'),
-    {readdirSync} = require('fs'),
-    {join} = require('path'),
-    yargs = require('yargs'),
-    {xl, m} = require('./helpers/timeouts');
+    {join, resolve} = require('path'),
+    {hasMagic, sync} = require('glob'),
+    yargs = require('yargs');
 
 const {argv} = yargs
+    .string('conf')
     .string('test')
     .string('suite')
-    .default('suite', '');
+    .default('suite', '')
+    .default('conf', 'mocha.conf.js');
 
-const testDir = `./src/tests/${argv.suite}`;
+const cwd = process.cwd();
+const {reporter, timeouts, suites} = require(join(cwd, argv.conf));
 
-const mocha = new Mocha({
-    reporter: 'mocha-rp-reporter',
-    configFile: '../reportportal.conf.json'
-});
+const mocha = new Mocha(reporter);
 
 try {
-    mocha.slow(m);
-    mocha.timeout(xl);
+    mocha.slow(timeouts.slow);
+    mocha.timeout(timeouts.test);
 
-    readdirSync(testDir)
-        .filter(test => test.includes('.js'))
-        .forEach(test => mocha.addFile(join(testDir, test)));
+    for (const fileName of suites) {
+        const matches = hasMagic(fileName) ? sync(fileName, {cwd}) : [fileName];
+
+        for (const match of matches) {
+            if (argv.suite && !match.includes(argv.suite)) {
+                break;
+            }
+            mocha.addFile(resolve(cwd, match));
+        }
+    }
 
     mocha.grep(argv.test);
 
