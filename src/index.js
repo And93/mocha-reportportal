@@ -26,7 +26,7 @@ try {
 
         for (const match of matches) {
             if (argv.suite && !match.includes(argv.suite)) {
-                break;
+                continue;
             }
             mocha.addFile(resolve(cwd, match));
         }
